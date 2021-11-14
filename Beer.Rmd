@@ -12,13 +12,28 @@ knitr::opts_chunk$set(echo = TRUE)
 ## R Markdown
 
 
-```{r beer}
+```{r echo=TRUE}
+library(forecast)
+library(timeSeries)
+library(nortest)
+library(tseries)
+library(TSA)
+library(lmtest)
+library(ggplot2)
 
 ```
 
 
 
-```{r pressure, echo=FALSE}
-
+```{r echo=TRUE}
+Data_beer= read.csv(file = "monthly_beer.csv")
 ```
+
+```{r echo=TRUE}
+head(Data_beer)
+```
+
+Tenemos Data_beer en data frame tenemos que tener el formato de serie de tiempo. 
+
+
 
