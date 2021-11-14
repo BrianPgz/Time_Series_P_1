@@ -109,8 +109,30 @@ Con un $p-value = 0.01$, y un nivel de confianza del $.05$, rechazamos hipótesi
 Para el periodo vamos a usar la función $cycle()$
 
 ```{r echo=TRUE}
-cycle(S_beer) 
+plot(cycle(S_beer),main="Ciclos") 
 ```
+Como la serie va de 1956 a 1995, en la gráfica observamos 10 ciclos cada 10 años, entonces el ciclo se repite anualmente, con un periodo $d=12$ en meses. 
+
+Vamos a hacer una transformación para tratar de obtener varianza constante. 
+
+
+Veamos primero qué pasa con el logaritmo de la serie. 
+
+
+```{r echo=TRUE}
+log_S_beer = log(S_beer)
+ts.plot(log_S_beer, main= "logaritmo de la serie")
+
+```
+Parece ser que la varianza se estabiliza pero seguimos teniendo problemas con la tendencia. 
+
+```{r echo=TRUE}
+bptest(log_S_beer~ t1)
+
+```
+Con un $p-value = 0.3914$ la varianza es constante. 
+
+
 
 
 
