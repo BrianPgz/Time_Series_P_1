@@ -96,7 +96,21 @@ bptest( S_beer ~ t1)
 
 Con un $p-value$ de casi cero entonces rechazamos $Ho$, entonces tenemos varianza no constante. 
 
+Vamos a hacer la prueba de Dickey-Fuller
 
+$Ho:$ La serie no es estacionaria $vs.$ $H1:$ La serie es estacionaria
+
+
+```{r echo=TRUE}
+adf.test(S_beer) 
+```
+Con un $p-value = 0.01$, y un nivel de confianza del $.05$, rechazamos hipótesis nula, entonces es estacionaria. 
+
+Para el periodo vamos a usar la función $cycle()$
+
+```{r echo=TRUE}
+cycle(S_beer) 
+```
 
 
 
