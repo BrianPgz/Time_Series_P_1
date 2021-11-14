@@ -75,3 +75,65 @@ Observamos varianza creciente, al principio se ve puede observar tendencia pero 
 
 En el $ACF$ Observamos alta correlación y que además no decae la correlación de manera exponencial. Para el $PACF$ observamos que la correlación parcial sigue siendo alta y por ello aproximadamente 15 barras se salen de las barras de confianza.  
 
+
+Podemos observar ciclos con un periodo igual a 12. 
+
+```{r echo=TRUE}
+desc_datos = decompose(S_beer)
+plot(desc_datos)   
+
+```
+Observamos que la tendencia cambia y tenemos ciclos, además del componente aleatorio. Vamos a hacer pruebas, y si es el caso haremos transformaciones para arreglar la serie.   
+
+Haciendo el $bp \ test$ vamos a contrastar la varianza. 
+
+$Ho:$ La varianza es constante (Homocedasticidad)   $vs.$  $H1:$ La varianza no es constate (Heterocedasticidad)
+
+```{r echo=TRUE}
+t1=seq(1956,1995.59,by=1/12)
+bptest( S_beer ~ t1)  
+```
+
+Con un $p-value$ de casi cero entonces rechazamos $Ho$, entonces tenemos varianza no constante. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
