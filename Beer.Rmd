@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## R Markdown
 
 
-```{r echo=TRUE}
+```{r echo=FALSE}
 library(forecast)
 library(timeSeries)
 library(nortest)
@@ -33,7 +33,45 @@ Data_beer= read.csv(file = "monthly_beer.csv")
 head(Data_beer)
 ```
 
-Tenemos Data_beer en data frame tenemos que tener el formato de serie de tiempo. 
+Tenemos $Data_beer$ en data frame tenemos que tener el formato de serie de tiempo. 
 
+Vamos a obtener la primera y la última fecha.
 
+```{r echo=TRUE}
+tamanio_base = length(Data_beer$Month)
+```
+Tenemos que la base tiene 476 datos. 
+
+```{r echo=TRUE}
+Data_beer$Month[1]
+Data_beer$Month[476]
+```
+La base tiene fecha de inicio en enero de 1956 y fin en agosto de 1995. Vamos a crear el objeto serie de tiempo.
+
+```{r echo=TRUE}
+S_beer = ts(Data_beer$Monthly.beer.production, start = c(1956, 1), end = c(1995, 8), frequency = 12)
+S_beer
+```
+
+Vamos a visualizar la serie de tiempo. 
+
+```{r echo=TRUE}
+ts.plot(S_beer,main = "Serie de tiempo de producción mensual de cerveza")
+```
+
+Obtengamos algunas medidas importantes. 
+
+```{r echo=TRUE}
+mean(S_beer)
+var(S_beer)
+sd(S_beer)
+```
+Veamos los correlogramas de la serie de tiempo. 
+```{r echo=TRUE}
+tsdisplay(S_beer, main = "Serie de tiempo de producción mensual de cerveza")
+```
+
+Observamos varianza creciente, al principio se ve puede observar tendencia pero cerca de 1980 se rompe la tendencia, o bien, la tendencia cambia. 
+
+En el $ACF$ Observamos alta correlación y que además no decae la correlación de manera exponencial. Para el $PACF$ observamos que la correlación parcial sigue siendo alta y por ello aproximadamente 15 barras se salen de las barras de confianza.  
 
