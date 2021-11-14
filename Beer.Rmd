@@ -133,6 +133,25 @@ bptest(log_S_beer~ t1)
 Con un $p-value = 0.3914$ la varianza es constante. 
 
 
+```{r echo=TRUE}
+adf.test(log_S_beer) 
+```
+Con un $p-value=0.03871$ menor al $.05$, rechazamos $Ho$ entonces la serie es estacionaria. 
+
+
+```{r echo=TRUE}
+desc_datos = decompose(log_S_beer)
+plot(desc_datos)  
+```
+
+Con el logaritmo obtenemos varianza constante, seguimos viendo ciclos anuales aunque seguimos teniendo problemas con la tendencia. 
+
+
+  
+
+
+
+
 
 
 
