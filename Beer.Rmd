@@ -39,6 +39,7 @@ Vamos a obtener la primera y la última fecha.
 
 ```{r echo=TRUE}
 tamanio_base = length(Data_beer$Month)
+tamanio_base
 ```
 
 Tenemos que la base tiene 476 datos. 
@@ -52,7 +53,7 @@ La base tiene fecha de inicio en enero de 1956 y fin en agosto de 1995. Vamos a 
 
 ```{r echo=TRUE}
 S_beer = ts(Data_beer$Monthly.beer.production, start = c(1956, 1), end = c(1995, 8), frequency = 12)
-S_beer
+head(S_beer,24)
 ```
 
 Vamos a visualizar la serie de tiempo. 
@@ -68,6 +69,9 @@ mean(S_beer)
 var(S_beer)
 sd(S_beer)
 ```
+
+Tenemos que mensualmente en promedio de produce $136.3954$ millones de litros de cerveza con una desviación estándar de $33.73872$ millones de litros de cerveza al mes. 
+
 
 Veamos los correlogramas de la serie de tiempo. 
 
@@ -112,6 +116,16 @@ adf.test(S_beer)
 
 Con un $p-value = 0.01$, y un nivel de confianza del $.05$, rechazamos hipótesis nula, entonces es estacionaria. 
 
+
+Para contrastar nuestros resultados vamos a usar la prueba de phillips. 
+
+$Ho:$ La serie es estacionaria $vs.$ $H1:$ La serie no es estacionaria
+
+```{r echo=TRUE}
+kpss.test(S_beer)
+```
+Con un $p-value=0.01$ rechazamos $Ho$ entonces la serie no es estacionaria. Como esto contradice a la prueba anterior debemos de trabajar con una trandformación de la serie.
+
 Para el periodo vamos a usar la función $cycle()$
 
 ```{r echo=TRUE}
@@ -119,8 +133,6 @@ plot(cycle(S_beer),main="Ciclos")
 ```
 
 Como la serie va de 1956 a 1995, en la gráfica observamos 10 ciclos cada 10 años, entonces el ciclo se repite anualmente, con un periodo $d=12$ en meses. 
-
-Vamos a hacer una transformación para tratar de obtener varianza constante. 
 
 
 Veamos primero qué pasa con el logaritmo de la serie. 
@@ -146,7 +158,15 @@ Con un $p-value = 0.3914$ la varianza es constante.
 adf.test(log_S_beer) 
 ```
 
-Con un $p-value=0.03871$ menor al $.05$, rechazamos $Ho$ entonces la serie es estacionaria. 
+Con un $p-value=0.03871$ menor al $.05$, rechazamos $Ho$ entonces la serie es estacionaria. Para contrastar, tenemos que hacer la prueba de phillips. 
+
+$Ho:$ La serie es estacionaria $vs.$ $H1:$ La serie no es estacionaria
+
+```{r echo=TRUE}
+kpss.test(log_S_beer)
+```
+Para la transformación logaritmo se siguen contradiciendo las pruebas. Aunque tenemos varianza constante. 
+
 
 
 ```{r echo=TRUE}
@@ -204,15 +224,23 @@ lines(time_plus,predictor,col="blue",lwd = 3)
 Haciendo la predicción con el polinomio de grado dos observamos el cambio de la tendencia cerca del año 1980.
 
 
-Veamos qué pasa cuando aplicamos una diferencia a los datos originales. 
+Veamos qué pasa cuando aplicamos una diferencia a los datos bajo la transformación logaritmo. 
 
 ```{r echo=TRUE}
-diff_S_berr = diff(S_beer)
+diff_S_berr = diff(log_S_beer)
 plot(diff_S_berr)   
 
 ```
 
-Con este método quitamos la tendencia, se observan ciclos pero tenemos varianza creciente
+Con este método quitamos la tendencia, se observan ciclos pero tenemos varianza constante, procedemos a hacer las pruebas. 
+
+
+```{r echo=TRUE}
+new_t= t1[2:(length(t1))]
+bptest(diff_S_berr ~ new_t)
+```
+Rechazamos
+
 
 
 
