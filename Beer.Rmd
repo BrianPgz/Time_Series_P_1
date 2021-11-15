@@ -147,48 +147,47 @@ plot(desc_datos)
 Con el logaritmo obtenemos varianza constante, seguimos viendo ciclos anuales aunque seguimos teniendo problemas con la tendencia. 
 
 
-  
+Queremos usar métodos de descomposición adecuado. Primero veamos modelos de regresión. 
 
 
+```{r echo=TRUE}
+time=t1
+time2=t1*t1
+time3=t1*t1*t1
+regresion_simple= lm(log_S_beer ~ time)
+plot(log_S_beer,main="Serie con varianza constante (Logaritmo)",lwd = 3, xlab = "Tiempo", col = "black")
+lines(time,regresion_simple$fitted.values,col="blue",lwd = 3)
+```
 
+Parece ser que un modelo lineal no es la mejor opción, usemos un polinomio. 
 
+```{r echo=TRUE}
+time=t1
+time2=t1*t1
+time3=t1*t1*t1
+regresion_square= lm(log_S_beer ~ time + time2)
+plot(log_S_beer,main="Serie con varianza constante (Logaritmo)",lwd = 3, xlab = "Tiempo", col = "black")
+lines(time,regresion_square$fitted.values,col="blue",lwd = 3)
+```
 
+Parece que un polinomio cuadratico ajusta bien a la serie de tiempo. 
 
+Vamos a predecir tres años futuros, primero vamos a llenar los datos que se van a predecir con NA.
 
+```{r echo=TRUE}
+time_plus=seq(1956,1998.59,by=1/12)
+time_plus2=time_plus*time_plus
+time_plus3=time_plus*time_plus*time_plus
+df_pred <- data.frame(X = time_plus,Y=time_plus2 , Z = c(log_S_beer, rep(NA, 36) ))
+```
 
+```{r echo=TRUE}
 
+predictions <- lm(formula = Z ~ X + Y, data = df_pred)
+predictor=predict(object = predictions, newdata = df_pred) 
+plot_serie=plot(log_S_beer,main="Serie con varianza constante (Logaritmo y Prediccion de 3 años)",lwd = 3, xlab = "Tiempo", col = "black",xlim=c(1956,1999))
+lines(time_plus,predictor,col="blue",lwd = 3)
+```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Haciendo la predicción con el polinomio de grado dos observamos el cambio de la tendencia cerca del año 1980.
 
