@@ -239,7 +239,7 @@ Con este método quitamos la tendencia, se observan ciclos pero tenemos varianza
 new_t= t1[2:(length(t1))]
 bptest(diff_S_berr ~ new_t)
 ```
-Rechazamos
+Rechazamos hipótesis nula entonces no tiene varianza constante.
 
 
 
