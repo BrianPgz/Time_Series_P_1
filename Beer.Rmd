@@ -40,12 +40,14 @@ Vamos a obtener la primera y la última fecha.
 ```{r echo=TRUE}
 tamanio_base = length(Data_beer$Month)
 ```
+
 Tenemos que la base tiene 476 datos. 
 
 ```{r echo=TRUE}
 Data_beer$Month[1]
 Data_beer$Month[476]
 ```
+
 La base tiene fecha de inicio en enero de 1956 y fin en agosto de 1995. Vamos a crear el objeto serie de tiempo.
 
 ```{r echo=TRUE}
@@ -66,7 +68,9 @@ mean(S_beer)
 var(S_beer)
 sd(S_beer)
 ```
+
 Veamos los correlogramas de la serie de tiempo. 
+
 ```{r echo=TRUE}
 tsdisplay(S_beer, main = "Serie de tiempo de producción mensual de cerveza")
 ```
@@ -83,6 +87,7 @@ desc_datos = decompose(S_beer)
 plot(desc_datos)   
 
 ```
+
 Observamos que la tendencia cambia y tenemos ciclos, además del componente aleatorio. Vamos a hacer pruebas, y si es el caso haremos transformaciones para arreglar la serie.   
 
 Haciendo el $bp \ test$ vamos a contrastar la varianza. 
@@ -104,6 +109,7 @@ $Ho:$ La serie no es estacionaria $vs.$ $H1:$ La serie es estacionaria
 ```{r echo=TRUE}
 adf.test(S_beer) 
 ```
+
 Con un $p-value = 0.01$, y un nivel de confianza del $.05$, rechazamos hipótesis nula, entonces es estacionaria. 
 
 Para el periodo vamos a usar la función $cycle()$
@@ -111,6 +117,7 @@ Para el periodo vamos a usar la función $cycle()$
 ```{r echo=TRUE}
 plot(cycle(S_beer),main="Ciclos") 
 ```
+
 Como la serie va de 1956 a 1995, en la gráfica observamos 10 ciclos cada 10 años, entonces el ciclo se repite anualmente, con un periodo $d=12$ en meses. 
 
 Vamos a hacer una transformación para tratar de obtener varianza constante. 
@@ -124,18 +131,21 @@ log_S_beer = log(S_beer)
 ts.plot(log_S_beer, main= "logaritmo de la serie")
 
 ```
+
 Parece ser que la varianza se estabiliza pero seguimos teniendo problemas con la tendencia. 
 
 ```{r echo=TRUE}
 bptest(log_S_beer~ t1)
 
 ```
+
 Con un $p-value = 0.3914$ la varianza es constante. 
 
 
 ```{r echo=TRUE}
 adf.test(log_S_beer) 
 ```
+
 Con un $p-value=0.03871$ menor al $.05$, rechazamos $Ho$ entonces la serie es estacionaria. 
 
 
@@ -174,6 +184,7 @@ Parece que un polinomio cuadratico ajusta bien a la serie de tiempo.
 
 Vamos a predecir tres años futuros, primero vamos a llenar los datos que se van a predecir con NA.
 
+
 ```{r echo=TRUE}
 time_plus=seq(1956,1998.59,by=1/12)
 time_plus2=time_plus*time_plus
@@ -187,7 +198,54 @@ predictions <- lm(formula = Z ~ X + Y, data = df_pred)
 predictor=predict(object = predictions, newdata = df_pred) 
 plot_serie=plot(log_S_beer,main="Serie con varianza constante (Logaritmo y Prediccion de 3 años)",lwd = 3, xlab = "Tiempo", col = "black",xlim=c(1956,1999))
 lines(time_plus,predictor,col="blue",lwd = 3)
+
 ```
 
 Haciendo la predicción con el polinomio de grado dos observamos el cambio de la tendencia cerca del año 1980.
+
+
+Veamos qué pasa cuando aplicamos una diferencia a los datos originales. 
+
+```{r echo=TRUE}
+diff_S_berr = diff(S_beer)
+plot(diff_S_berr)   
+
+```
+
+Con este método quitamos la tendencia, se observan ciclos pero tenemos varianza creciente
+
+
+
+```{r echo=TRUE}
+diff_2_S_berr = diff(diff(S_beer))
+plot(diff_2_S_berr)   
+
+```
+```{r echo=TRUE}
+diff_3_S_berr = diff(diff(diff(S_beer)))
+plot(diff_3_S_berr)   
+
+```
+Observamos que no ganamos varianza constante haciendo diferencias pero quitamos la tendencia y ciclos. 
+
+
+
+
+
+
+
+
+
+Tenemos que ajustar el modelo ARIMA O SARIMA. 
+
+
+
+
+
+
+
+
+
+
+
 
