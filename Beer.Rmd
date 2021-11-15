@@ -234,6 +234,7 @@ plot(diff_S_berr)
 
 Con este método quitamos la tendencia, se observan ciclos pero tenemos varianza constante, procedemos a hacer las pruebas. 
 
+Con las diferencias perdemos datos. 
 
 ```{r echo=TRUE}
 new_t= t1[2:(length(t1))]
@@ -245,27 +246,120 @@ Rechazamos hipótesis nula entonces no tiene varianza constante.
 
 
 
+
 ```{r echo=TRUE}
-diff_2_S_berr = diff(diff(S_beer))
-plot(diff_2_S_berr)   
-
+adf.test(diff_S_berr)
 ```
+Obtenemos que la serie es estacionaria.
+
 ```{r echo=TRUE}
-diff_3_S_berr = diff(diff(diff(S_beer)))
-plot(diff_3_S_berr)   
-
+kpss.test(diff_S_berr)
 ```
-Observamos que no ganamos varianza constante haciendo diferencias pero quitamos la tendencia y ciclos. 
+
+Tenemos que aceptar hipótesis nula, entonces es una serie estacionaria.
+
+Ahora ya se cumple que la diferencia de la serie con logaritmo es estacionaria, por ambos test.  
+
+Tenemos que ajustar el modelo ARIMA O SARIMA, primero veamos qué pasa para los datos originales.
 
 
 
+```{r echo=TRUE}
+model1=auto.arima(S_beer)
+summary(model1)
+```
+
+Para los datos originales obtenemos un SARIMA$(0,1,3) \times (1,1,2) [12]$. Procedemos a comprobar supuestos. 
+
+Queremos ver que los coeficientes sean significativos. 
 
 
+```{r echo=TRUE}
+confint(Model1)
+```
+
+Como los intervalos de los coeficientes no intersectan a cero, son significativos. 
+
+Veamos si los residuales siguen una distribución normal.
+
+```{r echo=TRUE}
+qqnorm(Model1$residuals)
+qqline(Model1$residuals)
+```
 
 
+```{r echo=TRUE}
+jarque.bera.test(Model1$residuals)
+```
+
+Con un $p-value=0.1997$, obtenemos normalidad de residuales.
 
 
-Tenemos que ajustar el modelo ARIMA O SARIMA. 
+```{r echo=TRUE}
+shapiro.test(Model1$residuals)
+```
+Con un $p-value=0.1924$, obtenemos normalidad de residuales con ambas pruebas. 
+
+
+```{r echo=TRUE}
+time_var= 1:length(Model1$residuals)
+residuals_M1=as.numeric(Model1$residuals)
+bptest(residuals_M1~time_var)
+```
+
+Los residuales no pasaron el test de varianza constante. 
+
+Para ver que tengamos media cero, hacemos: 
+
+
+```{r echo=TRUE}
+t.test(Model1$residuals,mu = 0)
+```
+Con un $p-value=0.928$ no rechazamos hipótesis nula, entonces tiene media cero. 
+
+Veamos la correlación de los residuales.
+
+```{r echo=TRUE}
+tsdisplay(Model1$residuals)
+```
+
+Vemos que tenemos problemas con la correlación ya que muchas barras se salen de las bandas de confianza. Para ver si realmente tenemos problemas con la correlación vamos a usar un tsdiag. 
+
+
+```{r echo=TRUE}
+tsdiag(Model1,gof.lag = 50)
+```
+
+Observamos que en varios lag se salen de las bandas de coinfianza, vemos que están muy correlacionados los residuales.
+
+Con el $Model1$ el problema que tenemos es la varianza no constante y la alta correlación de los residuales.
+
+
+Ajustemos otro modelo, en base a las diferencias y el logaritmo. 
+
+```{r echo=TRUE}
+Model2=auto.arima(diff_S_berr)
+```
+Por medio del comando auto.arima obtenemos un SARIMA$(1,0,0)\times(2,0,0) [12]$.
+
+```{r echo=TRUE}
+summary(Model1)
+```
+
+
+```{r echo=TRUE}
+confint(Model2)
+```
+Tenemos coeficientes significativos. 
+
+
+```{r echo=TRUE}
+time_var_2= 1:length(Model2$residuals)
+residuals_M2=as.numeric(Model2$residuals)
+bptest(residuals_M2~time_var_2)
+```
+
+
 
 
 
