@@ -56,5 +56,19 @@ tsdiag(condiff, gof.lag = 50)
 
 
 
+sarim=sarima(log(data_ts),p=0,d = 1,q=1,P=0,D=1,Q=1,S=12)
+
+
+arim=arima(diff(log(data_ts)),order = c(1,0,1))
+arim
+tsdiag(arim)
+time= 1:length(arim$residuals)
+res_num=as.numeric(arim$residuals)
+bptest(res_num~time)#varianza constante de residuales
+jarque.bera.test(arim$residuals) #es normal
+shapiro.test(arim$residuals) #es normal 
+t.test(arim$residuals,mu=0)#media cero
+
+
 
 

@@ -393,29 +393,7 @@ Observamos que para el $Model2$ seguimos teniendo los problemas del modelos ante
 
 Vamos a proponer un mejor modelo, cambiando los coeficientes. Necesitamos una serie con varianza constante. 
 
-Proponemos la transformación raíz del logaritmo de la serie. 
-
-
-```{r echo=TRUE}
-model3=sqrt(log_S_beer)
-bptest(model3 ~ t1)
-```
-Ganamos que la serie sea homocedástica, entonces podemos proponer un SARIMA. 
-
-```{r echo=TRUE}
-model3=sqrt(log_S_beer)
-
-bptest(model3 ~ t1)
-
-```
-
-
-
-
-
-
-
-
+Proponemos la transformación diferencia del logaritmo de la serie. 
 
 
 
