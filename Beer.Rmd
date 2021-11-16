@@ -330,9 +330,9 @@ Vemos que tenemos problemas con la correlación ya que muchas barras se salen de
 tsdiag(model1,gof.lag = 50)
 ```
 
-Observamos que en varios lag se salen de las bandas de coinfianza, vemos que están muy correlacionados los residuales.
+Observamos que en varios lag se salen de las bandas de coinfianza, vemos que están muy correlacionados los residuales. Tenemos valores para los que el $p-value$ general está por debajo de las bandas.  
 
-Con el $model1$ el problema que tenemos es la varianza no constante y la alta correlación de los residuales, además falla en los supuestos de normalidad.
+Con el $model1$ el problema que tenemos es la varianza no constante y la alta correlación de los residuales, además falla en los supuestos de normalidad y el $p-value$ para Ljung-Box. 
 
 
 Ajustemos otro modelo, en base a las diferencias y el logaritmo. 
@@ -349,7 +349,7 @@ Por medio del comando auto.arima obtenemos un SARIMA$(1,0,0)\times(2,0,0) [12]$.
 ```{r echo=TRUE}
 confint(Model2)
 ```
-Tenemos coeficientes significativos. 
+Tenemos coeficientes significativos, no intersectan a cero. 
 
 
 ```{r echo=TRUE}
@@ -384,6 +384,39 @@ t.test(Model2$residuals,mu = 0)
 ```
 
 Tenemos media cero. 
+
+```{r echo=TRUE}
+tsdiag(Model2, gof.lag = 50)
+```
+Observamos que para el $Model2$ seguimos teniendo los problemas del modelos anterior. 
+
+
+Vamos a proponer un mejor modelo, cambiando los coeficientes. Necesitamos una serie con varianza constante. 
+
+Proponemos la transformación raíz del logaritmo de la serie. 
+
+
+```{r echo=TRUE}
+model3=sqrt(log_S_beer)
+bptest(model3 ~ t1)
+```
+Ganamos que la serie sea homocedástica, entonces podemos proponer un SARIMA. 
+
+```{r echo=TRUE}
+model3=sqrt(log_S_beer)
+
+bptest(model3 ~ t1)
+
+```
+
+
+
+
+
+
+
+
+
 
 
 
