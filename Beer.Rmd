@@ -275,35 +275,35 @@ Queremos ver que los coeficientes sean significativos.
 
 
 ```{r echo=TRUE}
-confint(Model1)
+confint(model1)
 ```
 
-Como los intervalos de los coeficientes no intersectan a cero, son significativos. 
+Como algunos intervalos de los coeficientes intersectan a cero, son no significativos (ma2,sar1,sma2).
 
 Veamos si los residuales siguen una distribución normal.
 
 ```{r echo=TRUE}
-qqnorm(Model1$residuals)
-qqline(Model1$residuals)
+qqnorm(model1$residuals)
+qqline(model1$residuals)
 ```
 
 
 ```{r echo=TRUE}
-jarque.bera.test(Model1$residuals)
+jarque.bera.test(model1$residuals)
 ```
 
-Con un $p-value=0.1997$, obtenemos normalidad de residuales.
+Con un $p-value$ de casi cero, obtenemos no normalidad de residuales.
 
 
 ```{r echo=TRUE}
-shapiro.test(Model1$residuals)
+shapiro.test(model1$residuals)
 ```
-Con un $p-value=0.1924$, obtenemos normalidad de residuales con ambas pruebas. 
+Con un $p-value$ de casi cero, obtenemos no normalidad de residuales con ambas pruebas. 
 
 
 ```{r echo=TRUE}
-time_var= 1:length(Model1$residuals)
-residuals_M1=as.numeric(Model1$residuals)
+time_var= 1:length(model1$residuals)
+residuals_M1=as.numeric(model1$residuals)
 bptest(residuals_M1~time_var)
 ```
 
@@ -313,38 +313,37 @@ Para ver que tengamos media cero, hacemos:
 
 
 ```{r echo=TRUE}
-t.test(Model1$residuals,mu = 0)
+t.test(model1$residuals,mu = 0)
 ```
-Con un $p-value=0.928$ no rechazamos hipótesis nula, entonces tiene media cero. 
+Con un $p-value=0.7171$ no rechazamos hipótesis nula, entonces tiene media cero. 
 
 Veamos la correlación de los residuales.
 
 ```{r echo=TRUE}
-tsdisplay(Model1$residuals)
+tsdisplay(model1$residuals)
 ```
 
 Vemos que tenemos problemas con la correlación ya que muchas barras se salen de las bandas de confianza. Para ver si realmente tenemos problemas con la correlación vamos a usar un tsdiag. 
 
 
 ```{r echo=TRUE}
-tsdiag(Model1,gof.lag = 50)
+tsdiag(model1,gof.lag = 50)
 ```
 
 Observamos que en varios lag se salen de las bandas de coinfianza, vemos que están muy correlacionados los residuales.
 
-Con el $Model1$ el problema que tenemos es la varianza no constante y la alta correlación de los residuales.
+Con el $model1$ el problema que tenemos es la varianza no constante y la alta correlación de los residuales, además falla en los supuestos de normalidad.
 
 
 Ajustemos otro modelo, en base a las diferencias y el logaritmo. 
 
 ```{r echo=TRUE}
 Model2=auto.arima(diff_S_berr)
+summary(Model2)
 ```
+
 Por medio del comando auto.arima obtenemos un SARIMA$(1,0,0)\times(2,0,0) [12]$.
 
-```{r echo=TRUE}
-summary(Model1)
-```
 
 
 ```{r echo=TRUE}
@@ -358,15 +357,33 @@ time_var_2= 1:length(Model2$residuals)
 residuals_M2=as.numeric(Model2$residuals)
 bptest(residuals_M2~time_var_2)
 ```
+Tenemos varianza no constante. 
 
 
+Veamos si los residuales son normales. 
 
 
+```{r echo=TRUE}
+adf.test(Model2$residuals)
+kpss.test(Model2$residuals)
+jarque.bera.test(Model2$residuals)
+shapiro.test(Model2$residuals)
+```
 
+En este caso aceptamos $Ho$, entonces los residuales siguen una distribución normal. 
 
+```{r echo=TRUE}
+qqnorm(Model2$residuals)
+qqline(Model2$residuals)
+```
 
+Ahora que tenemos normalidad veamos, la media. 
 
+```{r echo=TRUE}
+t.test(Model2$residuals,mu = 0)
+```
 
+Tenemos media cero. 
 
 
 
