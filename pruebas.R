@@ -115,5 +115,9 @@ points(ARMA_forecast - qnorm(0.975)*ARMA_forecast_se, type = "l", col ="red", lt
 points(ARMA_forecast + qnorm(0.975)*ARMA_forecast_se, type = "l", col ="red", lty = 2)
 
 
+forecast2anios<- forecast(log_arima, h= 24, level=c(80,95), fan = FALSE, lambda = NULL, biasadj = NULL)
+forecast2anios
+plot(forecast2anios)
+
 #pasa todos los supuestos
 #Vamos a hacer las predicciones 
