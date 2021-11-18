@@ -83,8 +83,8 @@ residuals_num2=as.numeric(fit2$residuals)
 plot(residuals_num2)
 hist(residuals_num2)
 t_res2=1:length(residuals_num2)
-bptest(residuals_num~t_res2) #los residuales de la segunda parte tienen varianza constante
-jarque.bera.test(residuals_num)#pero no son normales
+bptest(residuals_num2~t_res2) #los residuales de la segunda parte tienen varianza constante
+jarque.bera.test(residuals_num2)#pero no son normales
 shapiro.test(residuals_num2)#no son normales
 t.test(residuals_num2)#media cero 
 checkresiduals(fit2)
@@ -108,7 +108,7 @@ checkresiduals(log_arima)
 
 ARMA_forecast<- predict(log_arima, n.ahead =24)$pred 
 ARMA_forecast_se <- predict(log_arima, n.ahead = 24)$se
-ts.plot(log_second, xlim=c(1983,1996), main="Prediccion")
+ts.plot(log_second, xlim=c(1983,1997), main="Prediccion")
 points(ARMA_forecast, type = "l", col = "blue")
 #Intervalos de prediccion
 points(ARMA_forecast - qnorm(0.975)*ARMA_forecast_se, type = "l", col ="red", lty = 2)
