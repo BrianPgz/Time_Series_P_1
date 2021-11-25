@@ -1,5 +1,5 @@
 ---
-title: "Monthly Beer Production in Australia"
+title: "Monthly Beer Production in Australia (trabajo escrito)"
 author:
   - César Porfirio Alvarado Pérez
   - Eduardo Adame Serrano
@@ -80,12 +80,7 @@ Veamos los correlogramas de la serie de tiempo original
 tsdisplay(S_beer, main = "Serie de tiempo de producción mensual de cerveza")
 ```
 
-Observamos varianza creciente en la serie, al principio se ve puede observar tendencia pero cerca de 1980 se rompe la tendencia, o bien, la tendencia cambia. 
-
-En el $ACF$ Observamos alta correlación y que además no decae la correlación de manera exponencial. Para el $PACF$ observamos que la correlación parcial sigue siendo alta y por ello aproximadamente 15 barras se salen de las barras de confianza.  
-
-
-Podemos observar ciclos con un periodo igual a 12. 
+Observamos varianza creciente en la serie, al principio se ve puede observar tendencia pero cerca de 1980 se rompe la tendencia, o bien, la tendencia cambia. En el $ACF$ Observamos alta correlación y que además no decae la correlación de manera exponencial. Para el $PACF$ observamos que la correlación parcial sigue siendo alta y por ello aproximadamente 15 barras se salen de las barras de confianza, además podemos observar ciclos con un periodo igual a 12. 
 
 ```{r echo=FALSE, warning=FALSE}
 desc_datos = decompose(S_beer)
@@ -264,17 +259,14 @@ Tenemos que aceptar hipótesis nula, entonces es una serie estacionaria para la 
 
 Tenemos que ajustar el modelo ARIMA O SARIMA, primero veamos que tenemos un problema de cambio de tendencia esto se puede arreglar siguiendo dos pasos, primero se identifica el punto en el que la tendencia cambia que se llama punto de cambio, el segundo paso es partir la serie en sus puntos o punto de cambio y hacer el análisis por separado. 
 
-Hay varios métodos para estimar el punto de cambio, en este caso vamos a usar de la libreria strucchange, el método $breakpoints()$. 
+Hay varios métodos para estimar el punto de cambio, en este caso vamos a usar de la libreria strucchange, el método $breakpoints()$, nos quedamos con el breakpoint más cercano a 1980 que es en la posición 324 de la serie original, partimos en dos a la serie original vista como objeto $ts()$, en este caso trabajamos con S_beer que es la serie de tiempo original. La serie queda partida en diciembre de 1982, entonces la segunda parte empieza en enero de 1983, observamos la primera parte de la serie.
 
-```{r echo=TRUE, warning=FALSE}
+```{r warning=FALSE, include=FALSE}
 library(strucchange)
 bp.data <- breakpoints(Data_beer$Monthly.beer.production ~ 1)
 summary(bp.data)
 ```
 
-Nos quedamos con el breakpoint más cercano a 1980 que es en la posición 324 de la serie original. 
-
-Partimos en dos a la serie original vista como objeto $ts()$, en este caso trabajamos con S_beer que es la serie de tiempo original.
 
 ```{r warning=FALSE, include=FALSE}
 point=S_beer[324] 
@@ -284,7 +276,7 @@ part2=S_beer[325:length(S_beer)]
 part2=as.data.frame(part2)
 ```
 
-La serie queda partida en diciembre de 1982, entonces la segunda parte empieza en enero de 1983, observamos la primera parte de la serie.
+
 
 ```{r echo=FALSE, warning=FALSE}
 one_time = ts(part1,start = c(1956,1),end = c(1982,12),frequency = 12)
@@ -436,7 +428,7 @@ forecast2anios
 ```
 
 
-```{r}
+```{r echo=FALSE}
 plot(forecast2anios)
 ```
 

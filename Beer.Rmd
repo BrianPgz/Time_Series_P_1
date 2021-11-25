@@ -1,10 +1,13 @@
 ---
-title: "  Monthly Beer Production In Australia"
-author: "Eduardo Adame Serrano \\ Brian Pérez Gutiérrez \\ Luis Fernando Barranco Cruz \\ César Porfirio Alvarado Pérez "
+title: "Monthly Beer Production in Australia (R)"
+author:
+  - César Porfirio Alvarado Pérez
+  - Eduardo Adame Serrano
+  - Luis Fernando Barranco Cruz
+  - Brian Pérez Gutiérrez
 date: "14/11/2021"
 output: html_document
 ---
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -12,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## R Markdown
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+```{r message=FALSE, warning=FALSE, include=FALSE, paged.print=TRUE}
 library(forecast)
 library(timeSeries)
 library(nortest)
@@ -23,7 +26,7 @@ library(ggplot2)
 
 ```
 
-La bae de datos la tenemos en formato csv, primero se va a leer la base. 
+La base de datos la tenemos en formato csv, primero se va a leer la base. 
 
 ```{r echo=TRUE}
 Data_beer= read.csv(file = "monthly_beer.csv")
