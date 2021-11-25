@@ -1,6 +1,10 @@
 ---
-title: "  Monthly Beer Production In Australia"
-author: "Eduardo Adame Serrano \\ Brian Pérez Gutiérrez \\ Luis Fernando Barranco Cruz \\ César Porfirio Alvarado Pérez "
+title: "Monthly Beer Production in Australia"
+author:
+  - César Porfirio Alvarado Pérez
+  - Eduardo Adame Serrano
+  - Luis Fernando Barranco Cruz
+  - Brian Pérez Gutiérrez
 date: "14/11/2021"
 output: html_document
 ---
@@ -20,53 +24,48 @@ library(tseries)
 library(TSA)
 library(lmtest)
 library(ggplot2)
-
 ```
 
-La bae de datos la tenemos en formato csv, primero se va a leer la base. 
 
-```{r echo=TRUE}
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
 Data_beer= read.csv(file = "monthly_beer.csv")
 ```
 
-Observamos los primeros registros.
 
-```{r echo=TRUE}
+```{r message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
 head(Data_beer)
 ```
 
-Tenemos Data_beer en data frame entonces se pasará a formato de serie de tiempo. 
+Tenemos la base de datos de producción mensual de cerveza en Australia de enero de 1956 a agosto de 1995, la base cuenta con 476 datos. 
 
-Obtengamos el tamaño de la base.
-
-```{r echo=TRUE}
+```{r echo=FALSE}
 tamanio_base = length(Data_beer$Month)
 tamanio_base
 ```
 
-Vamos a obtener la primera y la última fecha.
+Vamos a obtener la primera y la última fecha, para estar seguros al convertir a serie de tiempo.
 
-```{r echo=TRUE}
+```{r echo=FALSE}
 Data_beer$Month[1]
 Data_beer$Month[476]
 ```
 
-La base tiene fecha de inicio en enero de 1956 y fin en agosto de 1995. Vamos a crear el objeto serie de tiempo.
+Creamos el objeto serie de tiempo a vemos los primeros registros.
 
-```{r echo=TRUE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 S_beer = ts(Data_beer$Monthly.beer.production, start = c(1956, 1), end = c(1995, 8), frequency = 12)
 head(S_beer,24)
 ```
 
 Vamos a visualizar la serie de tiempo. 
 
-```{r echo=TRUE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 ts.plot(S_beer,main = "Serie de tiempo de producción mensual de cerveza")
 ```
 
 Obtengamos algunas medidas importantes. 
 
-```{r echo=TRUE}
+```{r echo=TRUE, warning=FALSE}
 mean(S_beer)
 var(S_beer)
 sd(S_beer)
@@ -75,9 +74,9 @@ sd(S_beer)
 Tenemos que mensualmente en promedio de produce $136.3954$ millones de litros de cerveza con una desviación estándar de $33.73872$ millones de litros de cerveza al mes. 
 
 
-Veamos los correlogramas de la serie de tiempo. 
+Veamos los correlogramas de la serie de tiempo original
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 tsdisplay(S_beer, main = "Serie de tiempo de producción mensual de cerveza")
 ```
 
@@ -88,7 +87,7 @@ En el $ACF$ Observamos alta correlación y que además no decae la correlación 
 
 Podemos observar ciclos con un periodo igual a 12. 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 desc_datos = decompose(S_beer)
 plot(desc_datos)   
 
@@ -100,7 +99,7 @@ Haciendo el $bp \ test$ vamos a contrastar la varianza.
 
 $Ho:$ La varianza es constante (Homocedasticidad)   $vs.$  $H1:$ La varianza no es constate (Heterocedasticidad)
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 t1=seq(1956,1995.59,by=1/12)
 bptest( S_beer ~ t1)  
 ```
@@ -112,7 +111,7 @@ Vamos a hacer la prueba de Dickey-Fuller
 $Ho:$ La serie no es estacionaria $vs.$ $H1:$ La serie es estacionaria
 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 adf.test(S_beer) 
 ```
 
@@ -123,24 +122,25 @@ Para contrastar nuestros resultados vamos a usar la prueba de phillips.
 
 $Ho:$ La serie es estacionaria $vs.$ $H1:$ La serie no es estacionaria
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 kpss.test(S_beer)
 ```
+
 Con un $p-value=0.01$ rechazamos $Ho$ entonces la serie no es estacionaria. Como esto contradice a la prueba anterior debemos de trabajar con una trandformación de la serie.
 
 Para el periodo vamos a usar la función $cycle()$
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 plot(cycle(S_beer),main="Ciclos") 
 ```
 
 Como la serie va de 1956 a 1995, en la gráfica observamos 10 ciclos cada 10 años, entonces el ciclo se repite anualmente, con un periodo $d=12$ en meses. 
 
 
-Veamos primero qué pasa con el logaritmo de la serie. 
+Veamos el logaritmo de la serie. 
 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 log_S_beer = log(S_beer)
 ts.plot(log_S_beer, main= "logaritmo de la serie")
 
@@ -148,15 +148,15 @@ ts.plot(log_S_beer, main= "logaritmo de la serie")
 
 Parece ser que la varianza se estabiliza pero seguimos teniendo problemas con la tendencia. 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 bptest(log_S_beer~ t1)
 
 ```
 
-Con un $p-value = 0.3914$ la varianza es constante. 
+Con un $p-value = 0.3914$ la varianza es constante para la transformación logaritmo. 
 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 adf.test(log_S_beer) 
 ```
 
@@ -164,14 +164,14 @@ Con un $p-value=0.03871$ menor al $.05$, rechazamos $Ho$ entonces la serie es es
 
 $Ho:$ La serie es estacionaria $vs.$ $H1:$ La serie no es estacionaria
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 kpss.test(log_S_beer)
 ```
-Para la transformación logaritmo se siguen contradiciendo las pruebas. Aunque tenemos varianza constante. 
+Para la transformación logaritmo se siguen contradiciendo las pruebas, aunque tenemos varianza constante para el logarirmo de la serie. 
 
 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 desc_datos = decompose(log_S_beer)
 plot(desc_datos)  
 ```
@@ -179,10 +179,10 @@ plot(desc_datos)
 Con el logaritmo obtenemos varianza constante, seguimos viendo ciclos anuales aunque seguimos teniendo problemas con la tendencia. 
 
 
-Queremos usar métodos de descomposición adecuado. Primero veamos modelos de regresión. 
+Queremos usar métodos de descomposición adecuados. Primero veamos modelos de regresión. 
 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 time=t1
 time2=t1*t1
 time3=t1*t1*t1
@@ -193,7 +193,7 @@ lines(time,regresion_simple$fitted.values,col="blue",lwd = 3)
 
 Parece ser que un modelo lineal no es la mejor opción, usemos un polinomio. 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 time=t1
 time2=t1*t1
 time3=t1*t1*t1
@@ -202,23 +202,23 @@ plot(log_S_beer,main="Serie con varianza constante (Logaritmo)",lwd = 3, xlab = 
 lines(time,regresion_square$fitted.values,col="blue",lwd = 3)
 ```
 
-Parece que un polinomio cuadratico ajusta bien a la serie de tiempo. 
+Parece que un polinomio cuadrático ajusta bien a la serie de tiempo con logaritmo. 
 
-Vamos a predecir tres años futuros, primero vamos a llenar los datos que se van a predecir con NA.
+Vamos a predecir tres años futuros.
 
 
-```{r echo=TRUE}
+```{r warning=FALSE, include=FALSE}
 time_plus=seq(1956,1998.59,by=1/12)
 time_plus2=time_plus*time_plus
 time_plus3=time_plus*time_plus*time_plus
 df_pred <- data.frame(X = time_plus,Y=time_plus2 , Z = c(log_S_beer, rep(NA, 36) ))
 ```
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 
 predictions <- lm(formula = Z ~ X + Y, data = df_pred)
 predictor=predict(object = predictions, newdata = df_pred) 
-plot_serie=plot(log_S_beer,main="Serie con varianza constante (Logaritmo y Prediccion de 3 años)",lwd = 3, xlab = "Tiempo", col = "black",xlim=c(1956,1999))
+plot_serie=plot(log_S_beer,main="Serie con varianza constante (Logaritmo y Predicción de 3 años)",lwd = 3, xlab = "Tiempo", col = "black",xlim=c(1956,1999))
 lines(time_plus,predictor,col="blue",lwd = 3)
 
 ```
@@ -228,7 +228,7 @@ Haciendo la predicción con el polinomio de grado dos observamos el cambio de la
 
 Veamos qué pasa cuando aplicamos una diferencia a los datos bajo la transformación logaritmo. 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 diff_S_berr = diff(log_S_beer)
 plot(diff_S_berr)   
 
@@ -238,45 +238,45 @@ Con este método quitamos la tendencia, se observan ciclos pero tenemos varianza
 
 Con las diferencias perdemos datos. 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 new_t= t1[2:(length(t1))]
 bptest(diff_S_berr ~ new_t)
 ```
 
-Rechazamos hipótesis nula entonces no tiene varianza constante.
+Rechazamos hipótesis nula entonces no tiene varianza constante al hacer la diferencia de la serie.
 
 
 
 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 adf.test(diff_S_berr)
 ```
-Obtenemos que la serie es estacionaria.
+Obtenemos que la serie es estacionaria para la prueba Dickey-Fuller, con la diferencia aplicada a logaritmo.
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 kpss.test(diff_S_berr)
 ```
 
 
-Tenemos que aceptar hipótesis nula, entonces es una serie estacionaria.
+Tenemos que aceptar hipótesis nula, entonces es una serie estacionaria para la prueba de phillips. Ahora ya se cumple que la diferencia de la serie con logaritmo es estacionaria, por ambos test.   
 
-Ahora ya se cumple que la diferencia de la serie con logaritmo es estacionaria, por ambos test.  
 
 Tenemos que ajustar el modelo ARIMA O SARIMA, primero veamos que tenemos un problema de cambio de tendencia esto se puede arreglar siguiendo dos pasos, primero se identifica el punto en el que la tendencia cambia que se llama punto de cambio, el segundo paso es partir la serie en sus puntos o punto de cambio y hacer el análisis por separado. 
 
 Hay varios métodos para estimar el punto de cambio, en este caso vamos a usar de la libreria strucchange, el método $breakpoints()$. 
 
-```{r echo=TRUE}
+```{r echo=TRUE, warning=FALSE}
 library(strucchange)
 bp.data <- breakpoints(Data_beer$Monthly.beer.production ~ 1)
 summary(bp.data)
 ```
-Nos quedamos con el breakpoint más cercano a 1980 que es en la posición 324 de la serie original, la función breakpoint necesita un data frame.
+
+Nos quedamos con el breakpoint más cercano a 1980 que es en la posición 324 de la serie original. 
 
 Partimos en dos a la serie original vista como objeto $ts()$, en este caso trabajamos con S_beer que es la serie de tiempo original.
 
-```{r echo=TRUE}
+```{r warning=FALSE, include=FALSE}
 point=S_beer[324] 
 part1=S_beer[1:324]
 part1=as.data.frame(part1)
@@ -284,27 +284,25 @@ part2=S_beer[325:length(S_beer)]
 part2=as.data.frame(part2)
 ```
 
-La serie queda partida en diciembre de 1982, entonces la segunda parte empieza en enero de 1983.
+La serie queda partida en diciembre de 1982, entonces la segunda parte empieza en enero de 1983, observamos la primera parte de la serie.
 
-Observamos la primera parte de la serie.
-
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 one_time = ts(part1,start = c(1956,1),end = c(1982,12),frequency = 12)
 ts.plot(one_time)
 ```
 
 Observamos la segunda parte de la serie. 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 second_time=ts(part2,start = c(1983,1),end = c(1995,8),frequency = 12)
 ts.plot(second_time)
 ```
 
-Parece ser que la segunda parte tiene varianza constante, ciclos y no tiene tendencia. 
+Parece ser que la segunda parte tiene varianza constante, ciclos y no tiene tendencia (o bien se va haciendo una tendencia a la baja). 
 
-Nos es de interés la segunda parte de la serie ya que con esa información se van a hacer las predicciones. 
+Nos es de interés la segunda parte de la serie ya que con esa información se van a hacer las predicciones, se van a hacer la pruebas a la segunda parte de la serie ya que sabemos los resultados siguientes de la primera aprte entonces no trabajaremos con la parte uno de la serie puesto que ya sabemos qué fue lo que pasó (que es la parte dos). 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 t2=seq(1983,1995.59,by=1/12)
 bptest(second_time~t2)
 ```
@@ -312,16 +310,16 @@ bptest(second_time~t2)
 La segunda parte de la serie con un $p-value=0.9343$, cumple con tener varianza constante.
 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 adf.test(second_time)
 kpss.test(second_time)
 ```
-Como ambos test no se contradicen cumplen que la segunda parte es estacionaria con un $p-value$ de $0.01$ y $.1$.
+Como ambos test no se contradicen cumplen que la segunda parte es estacionaria con un $p-value$ de $0.01$ y $.1$ respectivamente.
 
 
 Vamos a ajustar el modelo con ayuda de auto.arima. 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 fit2=auto.arima(second_time)
 summary(fit2)
 ```
@@ -330,45 +328,45 @@ Proponemos un SARIMA$(1,0,0) \times (1,1,0)[12]$.
 
 Vemos el plot de los residuales del modelo. 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 residuals_num2=as.numeric(fit2$residuals)
 plot(residuals_num2)
 ```
 
 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 t_res2=1:length(residuals_num2)
 bptest(residuals_num2~t_res2) #los residuales de la segunda parte tienen varianza constante
 ```
 
 Los residuales del modelo (segunda parte de la serie) cumplen con varianza constante. 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 jarque.bera.test(residuals_num2)#pero no son normales
 shapiro.test(residuals_num2)#no son normales
 ```
 
 Los residuales del modelo (segunda parte de la serie) no pasan las pruebas de normalidad. 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 t.test(residuals_num2)#media cero 
 ```
 
 Los residuales tienen media cero. 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 checkresiduals(fit2)
 tsdiag(fit2)
 ```
 
-Los residuales no cumplen con la no correlación.
+Los residuales no cumplen con la no correlación, lo podemos ver en el $ACF$ ya que tenemos muchos que se salen de las barras de confianza y también en el plot del $p-value$ de Ljung-Box, ya que se acerca a cero muy rápido. 
 
 Procedemos a hacer transformaciones para encontrar el modelo que cumpla con los supuestos. 
 
 Usamos la transformación logaritmo de la segunda parte de la serie, visualizamos la descomposición.
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 log_second=log(second_time)
 ts.plot(log_second)
 decom_log=decompose(log_second)
@@ -377,22 +375,16 @@ plot(decom_log)
 
 Proponemos el modelo con el logaritmo de la segunda parte de la serie.
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 log_arima=auto.arima(log_second)
 summary(log_arima)
 ```
 
-Proponemos un SARIMA$(3,0,3) \times (1,1,1)[12]$.
-
-Vemos si los coeficientes son significativos. 
-
-```{r echo=TRUE}
-confint(log_arima)
-```
-Tenemos que para ma1, ma2 y sar1, los intervalos intersectan a cero.
+Proponemos un SARIMA$(3,0,3) \times (1,1,1)[12]$, hagamos las pruebas de los supuestos.
 
 
-```{r echo=TRUE}
+
+```{r echo=FALSE, warning=FALSE}
 residual_log=as.numeric(log_arima$residuals)
 t_t=1:length(residual_log)
 bptest(residual_log~t_t)
@@ -400,29 +392,30 @@ bptest(residual_log~t_t)
 
 Con un $p-value=0.8018$ tenemos varianza constante de residuales.
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 jarque.bera.test(residual_log)
 shapiro.test(residual_log)
 ```
 
 Los residuales pasan pruebas de normalidad. 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 tsdiag(log_arima)
 checkresiduals(log_arima)
 ```
 
-Pasamos pruebas de no correlación de residuales. 
+Pasamos pruebas de no correlación de residuales, se observa que el $ACF$ sólo tiene un lag en el que podríamos tener problemas pero con un $p-value = 0.08516$ pasa la prueba de Ljung-Box test.
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 t.test(residual_log)
 ```
-Los residuales pasan la prueba de media igual a cero. 
 
-Se cumplieron los supuestos, entonces vamos a hacer las predicciones. 
+Los residuales pasan la prueba de media igual a cero para el logaritmo de la segunda parte. 
+
+Se cumplieron los supuestos, entonces vamos a hacer las predicciones de dos años futuros. 
 
 
-```{r echo=TRUE}
+```{r echo=FALSE, warning=FALSE}
 ARMA_forecast<- predict(log_arima, n.ahead =24)$pred 
 ARMA_forecast_se <- predict(log_arima, n.ahead = 24)$se
 ts.plot(log_second, xlim=c(1983,1997), main="Predicción")
@@ -432,15 +425,25 @@ points(ARMA_forecast - qnorm(0.975)*ARMA_forecast_se, type = "l", col ="red", lt
 points(ARMA_forecast + qnorm(0.975)*ARMA_forecast_se, type = "l", col ="red", lty = 2)
 ```
 
-Las predicciones se ven bastante acertadas. 
+Las predicciones se ven bastante acertadas además del intervalo de confianza. 
 
 Podemos hacerlo de otra forma con la libreria forecast. 
 
 
-```{r echo=TRUE}
+```{r warning=FALSE, include=FALSE}
 forecast2anios<- forecast(log_arima, h= 24, level=c(80,95), fan = FALSE, lambda = NULL, biasadj = NULL)
 forecast2anios
+```
+
+
+```{r}
 plot(forecast2anios)
 ```
+
+
+Observamos las predicciones a dos años para el modelo propuesto. 
+
+El problema de esta serie de tiempo fue el punto de cambio, por eso se trató con la segunda parte de la serie de tiempo, algo a destacar fue que el cambio de debió al aumento de oferta de cervezas extranjeras en el mercado australiano, ya que cerca de 1980 se vendió mucha cerveza de origen Inglés, lo que provocó una disminución en la producción local. 
+
 
 
